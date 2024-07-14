@@ -7,8 +7,6 @@ COPY package*.json ./
 
 RUN npm install
 
-MAINTAINER Gate6
-
 COPY  . .
 
 EXPOSE 3000

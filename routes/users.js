@@ -21,6 +21,9 @@ router.post('/register',upload.single('image'), resizeImage,  async (req, res) =
     }
 
     const { name, email, password } = req.body;
+     //console.log({name, email, password})
+     console.log('reqbody:', req.body);
+     console.log('req.file:', req.file);
 
     //check user is already register with us...
 
@@ -32,8 +35,14 @@ router.post('/register',upload.single('image'), resizeImage,  async (req, res) =
   
     try{
         // adding bcrpt password that coverts 
+        console.log('password:', password)
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({name, email, password: hashedPassword });
+        const user = new User({name, email, password: hashedPassword,
+            image: req.file ? {
+                data: req.file.buffer,
+                contentType: req.file.mimetype
+            } : null
+         });
         await user.save();
         return res.status(200).json({message: 'User register successfully'});
 
@@ -95,7 +104,11 @@ router.put('/profile', auth, upload.single('image'), resizeImage, async(req, res
         if (name) updates.name = name;
         if (email) updates.email = email;
       // if (password) updates.password = password;
-        if (password) updates.password = await bcrypt.hash(password, 10);
+          
+        if (password){ 
+            console.log('password:', password)
+            updates.password = await bcrypt.hash(password, 10);
+        } 
         if (req.file) {
             updates.image = {
                 data: req.file.buffer,
